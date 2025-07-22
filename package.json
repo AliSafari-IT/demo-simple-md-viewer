@@ -4,15 +4,17 @@
   "description": "A demo application for @asafarim/simple-md-viewer package",
   "type": "module",
   "scripts": {
+    "rm": "rm -rf dist && rm -rf node_modules && rm -rf package-lock.json && rm -rf pnpm-lock.yaml && rm -rf yarn.lock",
+    "predev": "npx kill-port 5173",
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "serve": "node server.js --watch",
+    "serve": "npx kill-port 3300 && node server.js --watch",
     "start": "concurrently \"npm run serve\" \"npm run dev\"",
     "test-server": "node server.js"
   },
   "dependencies": {
-    "@asafarim/simple-md-viewer": "^1.5.0",
+    "@asafarim/simple-md-viewer": "^1.5.1",
     "cors": "^2.8.5",
     "express": "^4.18.2",
     "react": "^18.2.0",

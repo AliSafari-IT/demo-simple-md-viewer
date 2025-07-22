@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@asafarim/simple-md-viewer':
-        specifier: ^1.5.0
-        version: 1.5.0(@types/react@18.3.23)
+        specifier: ^1.5.1
+        version: 1.5.1(@types/react@18.3.23)
       cors:
         specifier: ^2.8.5
         version: 2.8.5
@@ -61,8 +61,8 @@ packages:
       react: ^18.2.0
       react-dom: ^18.2.0
 
-  '@asafarim/simple-md-viewer@1.5.0':
-    resolution: {integrity: sha512-mKlg9CG8Xa4wbQ2NyPbqHuIB/+Piq/3RP801f83uOM888A5VeVUY5fxfWDbuIKhMmqS/kdL0izI8YE9PGn/3gA==}
+  '@asafarim/simple-md-viewer@1.5.1':
+    resolution: {integrity: sha512-r52ZIk4c2gMV6KJs5Xm0s27R+X+JoZbFrj7akpnW3alMUyhNudOa/MEdwpMRf+nOvDKucpSTvwayupBvpbEhkA==}
 
   '@babel/code-frame@7.27.1':
     resolution: {integrity: sha512-cjQ7ZlQ0Mv3b47hABuTevyTuYN4i+loJKGeV9flcCgIK37cCXRh+L1bd3iBHlynerhQ7BhCkn2BPbQUL+rGqFg==}
@@ -1367,7 +1367,7 @@ snapshots:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
-  '@asafarim/simple-md-viewer@1.5.0(@types/react@18.3.23)':
+  '@asafarim/simple-md-viewer@1.5.1(@types/react@18.3.23)':
     dependencies:
       '@asafarim/shared': 1.0.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       cors: 2.8.5

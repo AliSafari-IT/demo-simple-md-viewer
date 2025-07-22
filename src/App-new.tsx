@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { HashRouter, Routes, Route } from 'react-router-dom';
+import { HashRouter } from 'react-router-dom';
 import { MarkdownContent, ThemeProvider } from '@asafarim/simple-md-viewer';
 import '@asafarim/simple-md-viewer/dist/style.css';
 
@@ -22,24 +22,15 @@ function App() {
   }, [theme]);
 
   return (
-    <ThemeProvider theme={theme} toggleTheme={toggleTheme}>
-      <div className={`app ${theme}`}>
-        <HashRouter>
-          <Routes>
-            <Route 
-              path="/*" 
-              element={
-                <MarkdownContent 
-                  apiBaseUrl="http://localhost:3300" 
-                  showHomePage={true}
-                  hideFileTree={false}
-                />
-              } 
-            />
-          </Routes>
-        </HashRouter>
-      </div>
-    </ThemeProvider>
+    <HashRouter>
+      <ThemeProvider theme={theme} toggleTheme={toggleTheme}>
+        <MarkdownContent 
+          apiBaseUrl="http://localhost:3300" 
+          showHomePage={true}
+          hideFileTree={false}
+        />
+      </ThemeProvider>
+    </HashRouter>
   );
 }
 

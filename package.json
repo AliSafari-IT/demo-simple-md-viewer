@@ -1,0 +1,40 @@
+{
+  "name": "demo-simple-md-viewer",
+  "version": "1.0.0",
+  "description": "A demo application for @asafarim/simple-md-viewer package",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "serve": "node server.js --watch",
+    "start": "concurrently \"npm run serve\" \"npm run dev\"",
+    "test-server": "node server.js"
+  },
+  "dependencies": {
+    "@asafarim/simple-md-viewer": "^1.5.0",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.8.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.43",
+    "@types/react-dom": "^18.2.17",
+    "@types/react-router-dom": "^5.3.3",
+    "@vitejs/plugin-react": "^4.2.1",
+    "concurrently": "^8.2.2",
+    "typescript": "^5.2.2",
+    "vite": "^5.0.8"
+  },
+  "keywords": [
+    "markdown",
+    "viewer",
+    "react",
+    "demo"
+  ],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.13.1"
+}

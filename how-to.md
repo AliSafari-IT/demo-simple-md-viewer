@@ -2,6 +2,16 @@
 
 Transform your markdown files into a professional documentation website! This tutorial will walk you through creating a stunning markdown viewer that displays your documentation with an interactive file tree, beautiful themes, and responsive design.
 
+## 📸 Preview
+
+Here's what you'll build:
+
+![Simple Markdown Viewer Output](./public/simple-md-viewer-output.png)
+*Main viewer with file tree navigation and markdown content*
+
+![Simple Markdown Viewer Directory View](./public/simple-md-viewer-list-detailview.png)
+*Directory browsing with detailed file information*
+
 ## 🎯 What You'll Build
 
 By the end of this tutorial, you'll have:

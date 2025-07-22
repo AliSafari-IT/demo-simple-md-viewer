@@ -10,6 +10,9 @@ tags:
   - markdown
   - documentation
 ---
+[![npm version](https://badge.fury.io/js/@asafarim%2Fsimple-md-viewer.svg)](https://www.npmjs.com/package/@asafarim/simple-md-viewer)
+[![GitHub](https://img.shields.io/badge/github-repo-blue)](https://github.com/AliSafari-IT/simple-md-viewer)
+
 
 # Welcome to Your Markdown Documentation 📚
 
@@ -97,5 +100,19 @@ Now that you have a working demo:
 2. **Deploy**: Deploy both the frontend and backend to your preferred hosting platform
 3. **Extend**: Add more markdown files and organize your documentation
 4. **Integrate**: Embed this into your existing applications or websites
+
+## 📚 Learn How to Build This
+
+Want to create your own markdown viewer? Follow our comprehensive tutorial:
+
+👉 **[Complete Tutorial: How to Build This Markdown Viewer](./how-to.md)**
+
+The tutorial covers:
+- 🏗️ **Complete setup** from scratch
+- 🔧 **Backend configuration** with Express.js
+- ⚛️ **React frontend** implementation
+- 🎨 **Styling and theming**
+- 🐛 **Troubleshooting common issues**
+- 🚀 **Deployment tips**
 
 Enjoy exploring your markdown documentation with this beautiful viewer! 🎉

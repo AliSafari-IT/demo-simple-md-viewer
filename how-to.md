@@ -1,23 +1,23 @@
-# Tutorial: Build a Beautiful Markdown Viewer with @asafarim/simple-md-viewer
+# Complete Tutorial: Build a Professional Markdown Documentation Site with @asafarim/complete-md-viewer
 
-Transform your markdown files into a professional documentation website! This tutorial will walk you through creating a stunning markdown viewer that displays your documentation with an interactive file tree, beautiful themes, and responsive design.
-
-## 📸 Preview
-
-Here's what you'll build:
-
-![Simple Markdown Viewer Output](./public/simple-md-viewer-output.png)
-*Main viewer with file tree navigation and markdown content*
-
-![Simple Markdown Viewer Directory View](./public/simple-md-viewer-list-detailview.png)
-*Directory browsing with detailed file information*
+Transform your markdown files into a professional documentation website! This tutorial shows you exactly how to implement the `@asafarim/complete-md-viewer` package based on a real working project.
 
 ## 🎯 What You'll Build
 
+### Dark Mode with Expanded Sidebar and Front Matter
+![Dark Mode with Sidebar and Front Matter](./complete-md-viewer_dark-mode_sidebar-menu_FrontMatter-expanded.png)
+
+### Light Mode with Collapsed Sidebar
+![Light Mode with Collapsed Sidebar](./complete-md-viewer_light-mode_sidebar-menu-collapsed.png)
+
+### Mobile-Responsive View
+![Mobile View](./complete-md-viewer_dark-mode_mobile-view.png)
+
 By the end of this tutorial, you'll have:
+
 - 📱 A **responsive markdown viewer** that works on desktop, tablet, and mobile
-- 🌳 **Interactive file tree navigation** to browse your documentation
-- 🎨 **Light/dark themes** with smooth transitions
+- 🌳 **Interactive file tree navigation** with professional collapsible sidebar
+- 🎨 **Light/dark themes** with smooth transitions and consistent styling
 - 📂 **Directory browsing** with file sizes and metadata
 - 📄 **YAML front matter support** for rich document metadata
 - 🚀 **Production-ready** documentation site
@@ -25,6 +25,7 @@ By the end of this tutorial, you'll have:
 ## 📋 Prerequisites
 
 Before we start, make sure you have:
+
 - **Node.js** (version 16 or higher) installed
 - **npm** or **pnpm** package manager
 - Basic knowledge of **React** and **JavaScript/TypeScript**
@@ -33,30 +34,36 @@ Before we start, make sure you have:
 ## 🏗️ Step 1: Set Up Your Project
 
 ### Create the Project Directory
+
 ```bash
 mkdir my-markdown-viewer
 cd my-markdown-viewer
 ```
 
 ### Initialize Your Project
+
 ```bash
 npm init -y
 ```
 
 ### Install Required Dependencies
+
+**Important**: Use version `^1.0.1` or higher of the complete-md-viewer package:
+
 ```bash
 # Core dependencies
-npm install @asafarim/simple-md-viewer react react-dom react-router-dom
+npm install @asafarim/complete-md-viewer@^1.0.1 react react-dom react-router-dom
 npm install express cors
 
 # Development dependencies  
 npm install --save-dev @types/react @types/react-dom @vitejs/plugin-react
-npm install --save-dev typescript vite concurrently
+npm install --save-dev typescript vite concurrently kill-port cross-env
 ```
 
 ## 📄 Step 2: Configure Your Project
 
 ### Create `package.json` Scripts
+
 Update your `package.json` with these scripts:
 
 ```json
@@ -75,6 +82,7 @@ Update your `package.json` with these scripts:
 ```
 
 ### Create `vite.config.ts`
+
 ```typescript
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
@@ -88,6 +96,7 @@ export default defineConfig({
 ```
 
 ### Create `tsconfig.json`
+
 ```json
 {
   "compilerOptions": {
@@ -189,9 +198,150 @@ app.listen(PORT, () => {
 });
 ```
 
-## ⚛️ Step 4: Create the React Application
+## ⚛️ Step 4: Key Implementation - How to Use the Package
+
+### Method 1: Direct Integration (Recommended)
+
+Based on the working implementation, here's how to properly integrate the `@asafarim/complete-md-viewer` package:
+
+**src/App.tsx** - Main application with routing:
+
+```tsx
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+} from "react-router-dom";
+import { CustomThemeProvider } from "./context/ThemeContext";
+import { Suspense } from "react";
+
+// Layout
+import Layout from "./components/layout/Layout";
+
+// Pages
+import Home from "./components/Home/Home";
+import Dashboard from "./components/Dashboard/Dashboard";
+import MarkdownViewer from "./components/MarkdownViewer/MarkdownViewer";
+
+// Component to conditionally render content based on the current route
+const AppContent = () => {
+  const location = useLocation();
+
+  // If the path starts with /docs, render the StandaloneMarkdownViewer
+  if (location.pathname.startsWith("/docs")) {
+    return (
+      <MarkdownViewer
+        apiBaseUrl="http://localhost:3300"
+        basePath="/docs"
+        hideFileTree={false}
+        integrated={false}
+      />
+    );
+  }
+
+  // If the path starts with /md-docs, render the IntegratedMarkdownViewer
+  if (location.pathname.startsWith("/md-docs")) {
+    return (
+      <MarkdownViewer
+        apiBaseUrl="http://localhost:3300"
+        basePath="/md-docs"
+        hideFileTree={false}
+        integrated={true}
+      />
+    );
+  }
+  // Otherwise render the regular routes
+  return (
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
+};
+
+function App() {
+  return (
+    <CustomThemeProvider>
+      <div className="app">
+        <BrowserRouter>
+          <Layout>
+            <Suspense fallback={<div>Loading...</div>}>
+              <AppContent />
+            </Suspense>
+          </Layout>
+        </BrowserRouter>
+      </div>
+    </CustomThemeProvider>
+  );
+}
+
+export default App;
+```
+
+### Method 2: Custom Wrapper Component
+
+**src/components/MarkdownViewer/CustomViewers.tsx** - Enhanced wrapper with mobile optimizations:
+
+```tsx
+import React, { useState, useEffect } from 'react';
+import { MarkdownViewerBase } from '@asafarim/complete-md-viewer';
+import '@asafarim/complete-md-viewer/dist/style.css';
+
+// Enhanced viewer wrapper with mobile optimizations
+const EnhancedMobileViewer: React.FC<{
+  apiBaseUrl: string;
+  basePath?: string;
+  hideFileTree?: boolean;
+  useExternalRouter?: boolean;
+}> = (props) => {
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Check if screen is mobile size
+  useEffect(() => {
+    const checkIsMobile = () => {
+      const mobile = window.innerWidth <= 768;
+      setIsMobile(mobile);
+    };
+    
+    // Initial check
+    checkIsMobile();
+    
+    // Add event listener for window resize
+    window.addEventListener('resize', checkIsMobile);
+    
+    // Cleanup
+    return () => window.removeEventListener('resize', checkIsMobile);
+  }, []);
+
+  return (
+    <div className={`enhanced-viewer ${isMobile ? 'mobile' : ''}`}>
+      <MarkdownViewerBase
+        {...props}
+        hideFileTree={isMobile ? false : props.hideFileTree}
+        useExternalRouter={props.useExternalRouter || true}
+      />
+    </div>
+  );
+};
+
+export { EnhancedMobileViewer };
+```
+
+### Essential CSS Import
+
+**Important**: Always import the CSS file to get the proper styling:
+
+```tsx
+import '@asafarim/complete-md-viewer/dist/style.css';
+```
+
+## ⚛️ Step 5: Create the React Application
 
 ### Create `index.html`
+
 ```html
 <!doctype html>
 <html lang="en">
@@ -208,6 +358,7 @@ app.listen(PORT, () => {
 ```
 
 ### Create `src/main.tsx`
+
 ```tsx
 import React from 'react';
 import ReactDOM from 'react-dom/client';
@@ -222,11 +373,12 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 ```
 
 ### Create `src/App.tsx`
+
 ```tsx
 import { useState, useEffect } from 'react';
 import { HashRouter } from 'react-router-dom';
-import { MarkdownContent, ThemeProvider } from '@asafarim/simple-md-viewer';
-import '@asafarim/simple-md-viewer/dist/style.css';
+import { MarkdownContent, ThemeProvider } from '@asafarim/complete-md-viewer';
+import '@asafarim/complete-md-viewer/dist/style.css';
 
 function App() {
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
@@ -265,6 +417,7 @@ export default App;
 ```
 
 ### Create `src/index.css`
+
 ```css
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
@@ -292,10 +445,11 @@ body {
 ```
 
 ### Create `src/vite-env.d.ts`
+
 ```typescript
 /// <reference types="vite/client" />
 
-declare module '@asafarim/simple-md-viewer' {
+declare module '@asafarim/complete-md-viewer' {
   import { ComponentType, ReactNode } from 'react';
   
   export interface MarkdownContentProps {
@@ -304,6 +458,7 @@ declare module '@asafarim/simple-md-viewer' {
     hideFileTree?: boolean;
     hideHeader?: boolean;
     hideFooter?: boolean;
+    sidebarCollapsed?: boolean; // Control initial sidebar state
   }
   
   export interface ThemeProviderProps {
@@ -316,17 +471,19 @@ declare module '@asafarim/simple-md-viewer' {
   export const ThemeProvider: ComponentType<ThemeProviderProps>;
 }
 
-declare module '@asafarim/simple-md-viewer/dist/style.css' {}
+declare module '@asafarim/complete-md-viewer/dist/style.css' {}
 ```
 
 ## 📁 Step 5: Prepare Your Markdown Content
 
 ### Create the Content Directory
+
 ```bash
 mkdir markdown-files
 ```
 
 ### Create a Sample README.md
+
 Create `markdown-files/README.md`:
 
 ```markdown
@@ -344,13 +501,13 @@ tags:
 
 # Welcome to My Documentation! 📚
 
-This is your new markdown documentation site built with @asafarim/simple-md-viewer.
+This is your new markdown documentation site built with @asafarim/complete-md-viewer.
 
 ## Features
 
-- 🌳 **Interactive File Tree**: Navigate through your documentation
+- 🌳 **Interactive File Tree**: Navigate through your documentation with collapsible sidebar
 - 📱 **Responsive Design**: Works on all devices  
-- 🎨 **Theme Support**: Light and dark modes
+- 🎨 **Theme Support**: Light and dark modes with consistent styling
 - 📄 **YAML Front Matter**: Rich document metadata
 
 ## Getting Started
@@ -359,23 +516,28 @@ Click on any file in the tree to view its content. Try switching between light a
 ```
 
 ### Add Your Existing Markdown Files
+
 Copy your existing markdown files into the `markdown-files` directory. Organize them in folders as needed.
 
 ## 🚀 Step 6: Run Your Documentation Site
 
 ### Start Both Servers
+
 ```bash
 npm start
 ```
 
 This will start:
-- **Backend server** at http://localhost:3300
-- **Frontend application** at http://localhost:5173
+
+- **Backend server** at <http://localhost:3300>
+- **Frontend application** at <http://localhost:5173>
 
 ### View Your Documentation
-Open your browser and visit http://localhost:5173
+
+Open your browser and visit <http://localhost:5173>
 
 You should see:
+
 - Your file tree on the left side
 - Your README content in the main area
 - Theme toggle in the header
@@ -384,6 +546,7 @@ You should see:
 ## 🎨 Step 7: Customize Your Site
 
 ### Modify Themes
+
 Edit `src/index.css` to customize colors:
 
 ```css
@@ -401,6 +564,7 @@ Edit `src/index.css` to customize colors:
 ```
 
 ### Configure Display Options
+
 Modify `MarkdownContent` props in `src/App.tsx`:
 
 ```tsx
@@ -410,12 +574,14 @@ Modify `MarkdownContent` props in `src/App.tsx`:
   hideFileTree={false}    // Show/hide the file tree sidebar
   hideHeader={false}      // Show/hide header with theme toggle
   hideFooter={false}      // Show/hide footer
+  sidebarCollapsed={true} // Start with sidebar collapsed (professional UI)
 />
 ```
 
 ## 📦 Step 8: Deploy Your Site
 
 ### Build for Production
+
 ```bash
 npm run build
 ```
@@ -423,11 +589,13 @@ npm run build
 ### Deploy Options
 
 #### Option 1: GitHub Pages
+
 1. Build your project: `npm run build`
 2. Deploy the `dist` folder to GitHub Pages
 3. Deploy your backend to Heroku, Vercel, or Railway
 
 #### Option 2: Self-Hosting
+
 1. Upload your built files to your web server
 2. Run the Node.js backend on your server
 3. Update the `apiBaseUrl` to point to your backend
@@ -435,6 +603,7 @@ npm run build
 ## 🔧 Advanced Features
 
 ### YAML Front Matter
+
 Add rich metadata to your markdown files:
 
 ```markdown
@@ -452,18 +621,22 @@ toc: true
 ```
 
 ### Directory Browsing
+
 When users click on folders, they'll see:
+
 - List, grid, or detailed view options
 - File sizes and modification dates
 - Search and filtering capabilities
 
 ### Mobile Responsiveness  
-The viewer automatically adapts to:
-- **Desktop**: Full sidebar and content
-- **Tablet**: Compressed sidebar
-- **Mobile**: Collapsible overlay sidebar
 
-## 🎉 Congratulations!
+The viewer automatically adapts to:
+
+- **Desktop**: Professional collapsible sidebar with toggle button
+- **Tablet**: Compressed sidebar with easy toggle
+- **Mobile**: Collapsible overlay sidebar optimized for touch
+
+## 🎉 Congratulations
 
 You've successfully created a beautiful markdown documentation site! Your viewers can now:
 
@@ -471,22 +644,26 @@ You've successfully created a beautiful markdown documentation site! Your viewer
 - 🎨 **Switch themes** for comfortable reading
 - 📱 **Access content** on any device
 - 🔍 **Navigate easily** through your organized content
+- 📑 **Maximize content space** with the professional collapsible sidebar
 
-## � Final Working Solution (Important!)
+## 🔧 Final Working Solution (Important!)
 
 After troubleshooting routing issues, here's the **correct App.tsx implementation** that ensures proper file routing:
 
 ```tsx
 import { useState, useEffect } from 'react';
 import { HashRouter, Routes, Route } from 'react-router-dom';
-import { MarkdownContent, ThemeProvider } from '@asafarim/simple-md-viewer';
-import '@asafarim/simple-md-viewer/dist/style.css';
+import { MarkdownContent, ThemeProvider } from '@asafarim/complete-md-viewer';
+import '@asafarim/complete-md-viewer/dist/style.css';
 
 function App() {
   const [theme, setTheme] = useState(() => {
     const savedTheme = localStorage.getItem('smv-theme') as 'light' | 'dark' | null;
     return savedTheme || 'light';
   });
+  
+  // Control sidebar collapsed state (true = collapsed by default for professional UI)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
 
   const toggleTheme = () => {
     setTheme(prevTheme => {
@@ -494,6 +671,10 @@ function App() {
       localStorage.setItem('smv-theme', newTheme);
       return newTheme;
     });
+  };
+  
+  const toggleSidebar = () => {
+    setSidebarCollapsed(prev => !prev);
   };
 
   useEffect(() => {
@@ -512,6 +693,7 @@ function App() {
                   apiBaseUrl="http://localhost:3300" 
                   showHomePage={true}
                   hideFileTree={false}
+                  sidebarCollapsed={sidebarCollapsed}
                 />
               } 
             />
@@ -531,17 +713,23 @@ export default App;
 2. **Component Hierarchy**: `ThemeProvider` → `HashRouter` → `Routes` → `Route` → `MarkdownContent`
 3. **Import Requirements**: Import `Routes` and `Route` from `react-router-dom`
 4. **URL Routing**: The package uses `useParams` internally to get file paths from URLs
+5. **Sidebar Control**: Use `sidebarCollapsed` prop to control the initial state of the sidebar
+6. **Theme Management**: Use `ThemeProvider` to manage light/dark theme with consistent styling
 
 This structure enables:
+
 - `http://localhost:5173/` → Shows README.md (home page)
 - `http://localhost:5173/#/changelogs/CHANGELOG.md` → Shows CHANGELOG.md content
 - `http://localhost:5173/#/folder/file.md` → Shows any specific file content
 
-## �💡 Next Steps
+## 💡 Next Steps
 
 - Add more markdown files to expand your documentation
 - Customize the styling to match your brand
 - Deploy to production for others to access
 - Consider adding search functionality or additional features
+- Experiment with sidebar collapsed/expanded states for different user experiences
+- Add custom controls for toggling the sidebar state
+- Implement user preferences to remember sidebar state between sessions
 
 Happy documenting! 🚀

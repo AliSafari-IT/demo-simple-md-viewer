@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import MarkdownViewerBase from '../../../package/src/components/MarkdownViewer';
+import { MarkdownViewerBase } from '@asafarim/complete-md-viewer';
+import '@asafarim/complete-md-viewer/dist/style.css';
 
 // Enhanced viewer wrapper with mobile optimizations
 const EnhancedMobileViewer: React.FC<{

@@ -13,7 +13,8 @@
     "start": "concurrently \"kill-port 3300 && node server.js\" \"kill-port 5173 && pnpm exec vite\"",
     "test-server": "pnpm kp && node server.js",
     "prod": "pnpm kp && cross-env NODE_ENV=production node server.js",
-    "build-and-serve": "pnpm build && pnpm prod"
+    "build-and-serve": "pnpm build && pnpm prod",
+    "gh-pages": "npm run build && gh-pages -d dist"
   },
   "dependencies": {
     "@asafarim/complete-md-viewer": "^1.0.1",
@@ -42,5 +43,6 @@
   ],
   "author": "",
   "license": "ISC",
-  "packageManager": "pnpm@10.13.1"
+  "packageManager": "pnpm@10.13.1",
+  "homepage": "https://alisafari-it.github.io/complete-md-viewer#readme"
 }

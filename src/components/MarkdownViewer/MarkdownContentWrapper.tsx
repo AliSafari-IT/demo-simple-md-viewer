@@ -1,6 +1,6 @@
 import React from 'react';
 // Import from our lib directory which re-exports from the local package
-import { IntegratedMarkdownViewer, StandaloneMarkdownViewer } from '../../lib/complete-md-viewer';
+import { IntegratedMarkdownViewer, StandaloneMarkdownViewer } from '@asafarim/complete-md-viewer';
 
 interface MarkdownContentWrapperProps {
   apiBaseUrl: string;

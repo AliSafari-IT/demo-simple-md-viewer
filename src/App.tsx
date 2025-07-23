@@ -1,45 +1,71 @@
-import { useState, useEffect } from 'react';
-import { HashRouter, Routes, Route } from 'react-router-dom';
-import { MarkdownContent, ThemeProvider } from '@asafarim/simple-md-viewer';
-import '@asafarim/simple-md-viewer/dist/style.css';
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+} from "react-router-dom";
+import { CustomThemeProvider } from "./context/ThemeContext";
+import { Suspense } from "react";
+
+// Layout
+import Layout from "./components/layout/Layout";
+
+// Pages
+import Home from "./components/Home/Home";
+import Dashboard from "./components/Dashboard/Dashboard";
+import MarkdownViewer from "./components/MarkdownViewer/MarkdownViewer";
+
+// Component to conditionally render content based on the current route
+const AppContent = () => {
+  const location = useLocation();
+
+  // If the path starts with /docs, render the StandaloneMarkdownViewer
+  if (location.pathname.startsWith("/docs")) {
+    return (
+      <MarkdownViewer
+        apiBaseUrl="http://localhost:3300"
+        basePath="/docs"
+        hideFileTree={false}
+        integrated={false}
+      />
+    );
+  }
+
+  // If the path starts with /md-docs, render the IntegratedMarkdownViewer
+  if (location.pathname.startsWith("/md-docs")) {
+    return (
+      <MarkdownViewer
+        apiBaseUrl="http://localhost:3300"
+        basePath="/md-docs"
+        hideFileTree={false}
+        integrated={true}
+      />
+    );
+  }
+  // Otherwise render the regular routes
+  return (
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
+};
 
 function App() {
-  const [theme, setTheme] = useState(() => {
-    const savedTheme = localStorage.getItem('smv-theme') as 'light' | 'dark' | null;
-    return savedTheme || 'light';
-  });
-
-  const toggleTheme = () => {
-    setTheme(prevTheme => {
-      const newTheme = prevTheme === 'light' ? 'dark' : 'light';
-      localStorage.setItem('smv-theme', newTheme);
-      return newTheme;
-    });
-  };
-
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-  }, [theme]);
-
   return (
-    <ThemeProvider theme={theme} toggleTheme={toggleTheme}>
-      <div className={`app ${theme}`}>
-        <HashRouter>
-          <Routes>
-            <Route 
-              path="/*" 
-              element={
-                <MarkdownContent 
-                  apiBaseUrl="http://localhost:3300" 
-                  showHomePage={true}
-                  hideFileTree={false}
-                />
-              } 
-            />
-          </Routes>
-        </HashRouter>
+    <CustomThemeProvider>
+      <div className="app">
+        <BrowserRouter>
+          <Layout>
+            <Suspense fallback={<div>Loading...</div>}>
+              <AppContent />
+            </Suspense>
+          </Layout>
+        </BrowserRouter>
       </div>
-    </ThemeProvider>
+    </CustomThemeProvider>
   );
 }
 

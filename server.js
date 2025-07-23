@@ -9,9 +9,13 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = 3300;
-const mdDocsPath = path.join(__dirname, 'markdown-files'); // Your markdown folder
+const mdDocsPath = path.join(__dirname, 'public' , 'markdown-files');
 
-app.use(cors({ origin: 'http://localhost:5173' }));
+app.use(cors({ origin: ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:3000'] }));
+
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, 'dist')));
+}
 
 // API to return folder structure
 app.get('/api/folder-structure', (req, res) => {
@@ -24,6 +28,48 @@ app.get('/api/folder-structure', (req, res) => {
   }
 });
 
+app.get('/api/files', (req, res) => {
+  try {
+    const folderStructure = getFileTreeForViewer(mdDocsPath);
+    res.json(folderStructure);
+  } catch (error) {
+    console.error('Error getting file tree:', error);
+    res.status(500).json({ error: 'Failed to read file tree' });
+  }
+});
+
+// Function to create file tree in the format expected by the markdown viewer component
+function getFileTreeForViewer(dirPath, relativePath = '') {
+  const items = fs.readdirSync(dirPath);
+  const result = [];
+
+  for (const item of items) {
+    const itemPath = path.join(dirPath, item);
+    const stats = fs.statSync(itemPath);
+    const itemRelativePath = path.join(relativePath, item).replace(/\\/g, '/');
+    const id = itemRelativePath; // Use path as ID
+
+    if (stats.isDirectory()) {
+      result.push({
+        id,
+        name: item,
+        path: itemRelativePath,
+        type: 'directory',
+        children: getFileTreeForViewer(itemPath, itemRelativePath)
+      });
+    } else if (item.endsWith('.md')) {
+      result.push({
+        id,
+        name: item,
+        path: itemRelativePath,
+        type: 'file'
+      });
+    }
+  }
+
+  return result;
+}
+
 // API to serve markdown files
 app.get('/api/file', (req, res) => {
   try {
@@ -31,6 +77,25 @@ app.get('/api/file', (req, res) => {
     if (fs.existsSync(filePath)) {
       const content = fs.readFileSync(filePath, 'utf-8');
       res.json({ content });
+    } else {
+      res.status(404).json({ error: 'File not found' });
+    }
+  } catch (error) {
+    console.error('Error reading file:', error);
+    res.status(500).json({ error: 'Failed to read file' });
+  }
+});
+
+// API to serve markdown files with path parameter (for compatibility with the client)
+app.get('/api/content/*', (req, res) => {
+  try {
+    // Extract the path from the URL (everything after /api/content/)
+    const requestPath = req.path.substring('/api/content/'.length);
+    const filePath = path.join(mdDocsPath, requestPath);
+    
+    if (fs.existsSync(filePath)) {
+      const content = fs.readFileSync(filePath, 'utf-8');
+      res.send(content); // Send raw content as text, not JSON
     } else {
       res.status(404).json({ error: 'File not found' });
     }
@@ -71,7 +136,7 @@ function getFolderStructure(dirPath, relativePath = '') {
       result.push({
         name: item,
         path: itemRelativePath,
-        type: 'folder',
+        type: 'directory',
         children: getFolderStructure(itemPath, itemRelativePath)
       });
     } else if (item.endsWith('.md')) {
@@ -103,7 +168,7 @@ function getDirectoryDetails(dirPath, relativePath = '') {
       children.push({
         name: item,
         path: itemRelativePath,
-        type: 'folder',
+        type: 'directory',
         size: folderSize,
         lastModified: stats.mtime.toISOString(),
         itemCount: itemCount
@@ -123,7 +188,7 @@ function getDirectoryDetails(dirPath, relativePath = '') {
   return {
     name: path.basename(dirPath) || 'root',
     path: relativePath,
-    type: 'folder',
+    type: 'directory',
     children: children
   };
 }
@@ -181,7 +246,18 @@ function countItemsInFolder(folderPath) {
   return count;
 }
 
+// Catch-all route to handle client-side routing
+if (process.env.NODE_ENV === 'production') {
+  app.get('*', (req, res) => {
+    // Exclude API routes
+    if (!req.path.startsWith('/api/')) {
+      res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+    }
+  });
+}
+
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);
   console.log(`📁 Serving markdown files from: ${mdDocsPath}`);
+  console.log(`🌐 API endpoints available at http://localhost:${PORT}/api/`);
 });
